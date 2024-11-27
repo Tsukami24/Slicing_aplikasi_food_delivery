@@ -2,6 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:starbak_mart/Pages/AddPage.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+
+final supabase = Supabase.instance.client;
 
 class CreatePage extends StatelessWidget {
   @override
@@ -21,6 +25,8 @@ class ProductForm extends StatefulWidget {
 class _ProductFormState extends State<ProductForm> {
   String _katagori = 'Makanan';
   XFile? _imageFile;
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _priceController = TextEditingController();
 
   Future<void> _pickImage() async {
     final ImagePicker _picker = ImagePicker();
@@ -43,7 +49,7 @@ class _ProductFormState extends State<ProductForm> {
               onPressed: () {
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => AddPage()),
+                  MaterialPageRoute(builder: (context) => Addpage()),
                 );
               },
               style: ElevatedButton.styleFrom(
@@ -80,6 +86,7 @@ class _ProductFormState extends State<ProductForm> {
         child: Column(
           children: [
             TextField(
+              controller: _nameController,
               decoration: InputDecoration(
                 labelText: 'Nama Produk',
                 border: OutlineInputBorder(
@@ -89,6 +96,7 @@ class _ProductFormState extends State<ProductForm> {
             ),
             SizedBox(height: 20),
             TextField(
+              controller: _priceController,
               decoration: InputDecoration(
                 labelText: 'Harga',
                 border: OutlineInputBorder(
@@ -140,7 +148,15 @@ class _ProductFormState extends State<ProductForm> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () async {
+                  final name = _nameController.text;
+                  final price = _priceController.text;
+
+                  await supabase.from('food').insert({
+                    'name': name,
+                    'price': price,
+                  });
+                },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),

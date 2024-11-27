@@ -2,18 +2,29 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:starbak_mart/Widgets/NavBarWidget.dart';
 import 'package:starbak_mart/Pages/CreatePage.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
-class AddPage extends StatelessWidget {
+final supabase = Supabase.instance.client;
+
+class Addpage extends StatefulWidget {
+  const Addpage({super.key});
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: ProductListScreen(),
-      debugShowCheckedModeBanner: false,
-    );
-  }
+  State<Addpage> createState() => _AddpageState();
 }
 
-class ProductListScreen extends StatelessWidget {
+class _AddpageState extends State<Addpage> {
+  Future<List<dynamic>> fetcData() async {
+    final List<Map<String, dynamic>> response =
+        await supabase.from('food').select('*');
+    return response as List<dynamic>;
+  }
+
+  Future<void> deleteData(int id) async {
+    await supabase.from('food').delete().eq('id', id);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -151,116 +162,69 @@ class ProductListScreen extends StatelessWidget {
               thickness: 1,
             ),
             SizedBox(height: 0),
-            Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Image.asset(
-                    "assets/burger.jpeg",
-                    height: 60,
-                    width: 60,
-                  ),
-                ),
-                SizedBox(width: 24),
-                Text(
-                  "Burger King Medium",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(width: 36),
-                Text(
-                  "Rp.50.000,00",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(width: 46),
-                Icon(CupertinoIcons.trash, size: 24, color: Colors.red),
-              ],
-            ),
-            SizedBox(height: 5),
-            Divider(
-              color: Colors.grey,
-              thickness: 1,
-            ),
-            SizedBox(height: 0),
-            Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Image.asset(
-                    "assets/burger.jpeg",
-                    height: 60,
-                    width: 60,
-                  ),
-                ),
-                SizedBox(width: 24),
-                Text(
-                  "Teh Botol",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(width: 87),
-                Text(
-                  "Rp.5.000,00",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(width: 53),
-                Icon(CupertinoIcons.trash, size: 24, color: Colors.red),
-              ],
-            ),
-            SizedBox(height: 5),
-            Divider(
-              color: Colors.grey,
-              thickness: 1,
-            ),
-            SizedBox(height: 0),
-            Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Image.asset(
-                    "assets/burger.jpeg",
-                    height: 60,
-                    width: 60,
-                  ),
-                ),
-                SizedBox(width: 24),
-                Text(
-                  "Burger King Small",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(width: 50),
-                Text(
-                  "Rp.35.000,00",
-                  style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(width: 46),
-                Icon(CupertinoIcons.trash, size: 24, color: Colors.red),
-              ],
-            ),
-          ],
-        ),
+            FutureBuilder<List<dynamic>>(
+              future: fetcData(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<List<dynamic>> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const CircularProgressIndicator();
+                } else if (snapshot.hasError) {
+                  return Text('eror: ${snapshot.error}');
+                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Text('No data found');
+                } else {
+                  final List<dynamic> data = snapshot.data!;
+            return Column(
+              children: data.map((item) {
+                return Padding(
+                  padding: EdgeInsets.symmetric(vertical: 5),
+                child: Row(
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Image.asset(
+                        "assets/burger.jpeg",
+                        height: 60,
+                        width: 60,
+                      ),
+                    ),
+                    SizedBox(width: 24),
+                    Text(
+                      item['name'] ?? 'Tidak ada nama',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(width: 36),
+                    Text(
+                      "Rp. ${item['price'] ?? '0'}",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 10,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(width: 46),
+                    IconButton(
+                                icon: Icon(CupertinoIcons.trash,
+                                    size: 24, color: Colors.red),
+                                onPressed: () async {
+                                  final id = item['id'];
+                              await deleteData(id);
+                                },
+                              ),
+                   ],
+                          ),
+                        );
+                      }).toList(),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );
