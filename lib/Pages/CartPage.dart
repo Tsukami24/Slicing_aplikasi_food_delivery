@@ -26,6 +26,9 @@ class _CartpageState extends State<Cartpage> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -81,12 +84,12 @@ class _CartpageState extends State<Cartpage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.only(top: 40, left: 20, right: 20),
+          padding: EdgeInsets.symmetric(
+              vertical: screenHeight * 0.02, horizontal: screenWidth * 0.05),
           child: Column(
             children: [
-              SizedBox(height: 5),
               FutureBuilder<List<dynamic>>(
-                future: fetchData(), // Corrected function name
+                future: fetchData(),
                 builder: (BuildContext context,
                     AsyncSnapshot<List<dynamic>> snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -105,24 +108,25 @@ class _CartpageState extends State<Cartpage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-                                  height: 100,
-                                  width: 100,
-                                  margin: EdgeInsets.only(left: 8),
-                                  padding: EdgeInsets.all(10),
+                                  height: screenHeight * 0.12,
+                                  width: screenWidth * 0.25,
+                                  margin:
+                                      EdgeInsets.only(left: screenWidth * 0.02),
+                                  padding: EdgeInsets.all(screenWidth * 0.02),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Image.asset(
                                     "assets/burger.jpeg",
-                                    height: 100,
-                                    width: 100,
+                                    fit: BoxFit.cover,
                                   ),
                                 ),
-                                SizedBox(width: 15),
+                                SizedBox(width: screenWidth * 0.04),
                                 Expanded(
                                   child: Padding(
-                                    padding: EdgeInsets.symmetric(vertical: 5),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: screenHeight * 0.01),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
@@ -133,14 +137,16 @@ class _CartpageState extends State<Cartpage> {
                                               item['name'] ?? 'Tidak ada nama',
                                               style: TextStyle(
                                                 color: Colors.black,
-                                                fontSize: 18,
+                                                fontSize: screenWidth * 0.045,
                                                 fontWeight: FontWeight.bold,
                                               ),
                                             ),
                                             Spacer(),
                                             IconButton(
-                                              icon: Icon(CupertinoIcons.trash,
-                                                  size: 24, color: Colors.red),
+                                              icon: Icon(
+                                                  CupertinoIcons.trash,
+                                                  size: screenWidth * 0.06,
+                                                  color: Colors.red),
                                               onPressed: () async {
                                                 final id = item['id'];
                                                 await deleteData(id);
@@ -152,23 +158,21 @@ class _CartpageState extends State<Cartpage> {
                                           "Rp. ${item['price'] ?? '0'}",
                                           style: TextStyle(
                                             color: Colors.black,
-                                            fontSize: 14,
+                                            fontSize: screenWidth * 0.04,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
-                                        SizedBox(height: 10),
+                                        SizedBox(height: screenHeight * 0.01),
                                         Row(
                                           mainAxisAlignment:
                                               MainAxisAlignment.spaceBetween,
                                           children: [
                                             Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.spaceAround,
                                               children: [
                                                 Icon(
                                                   CupertinoIcons
                                                       .minus_circle_fill,
-                                                  size: 24,
+                                                  size: screenWidth * 0.06,
                                                   color: const Color.fromARGB(
                                                       217, 227, 111, 10),
                                                 ),
@@ -177,16 +181,18 @@ class _CartpageState extends State<Cartpage> {
                                                   "1",
                                                   style: TextStyle(
                                                     fontWeight: FontWeight.bold,
-                                                    fontSize: 18,
+                                                    fontSize:
+                                                        screenWidth * 0.045,
                                                   ),
                                                 ),
                                                 SizedBox(width: 5),
                                                 Icon(
-                                                    CupertinoIcons
-                                                        .plus_circle_fill,
-                                                    size: 24,
-                                                    color: const Color.fromARGB(
-                                                        217, 227, 111, 10)),
+                                                  CupertinoIcons
+                                                      .plus_circle_fill,
+                                                  size: screenWidth * 0.06,
+                                                  color: const Color.fromARGB(
+                                                      217, 227, 111, 10),
+                                                ),
                                               ],
                                             ),
                                           ],
@@ -197,40 +203,42 @@ class _CartpageState extends State<Cartpage> {
                                 ),
                               ],
                             ),
-                            SizedBox(height: 20),
+                            SizedBox(height: screenHeight * 0.02),
                           ],
                         );
-                      }).toList(), // Correctly returning the mapped list
+                      }).toList(),
                     );
                   }
                 },
               ),
-              SizedBox(height: 20),
+              SizedBox(height: screenHeight * 0.02),
               Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        "Ringkasan  Belanja",
+                        "Ringkasan Belanja",
                         style: TextStyle(
                             color: Colors.black,
-                            fontSize: 18,
+                            fontSize: screenWidth * 0.05,
                             fontWeight: FontWeight.bold),
                       )
                     ],
                   ),
-                  SizedBox(height: 10),
+                  SizedBox(height: screenHeight * 0.01),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
                         "PPN 11%",
-                        style: TextStyle(color: Colors.grey, fontSize: 18),
+                        style:
+                            TextStyle(color: Colors.grey, fontSize: screenWidth * 0.045),
                       ),
                       Text(
                         "Rp.10.000,00",
-                        style: TextStyle(color: Colors.grey, fontSize: 18),
+                        style:
+                            TextStyle(color: Colors.grey, fontSize: screenWidth * 0.045),
                       )
                     ],
                   ),
@@ -239,20 +247,18 @@ class _CartpageState extends State<Cartpage> {
                     children: [
                       Text(
                         "Total Belanja",
-                        style: TextStyle(color: Colors.grey, fontSize: 18),
+                        style:
+                            TextStyle(color: Colors.grey, fontSize: screenWidth * 0.045),
                       ),
                       Text(
                         "Rp.94.000,00",
-                        style: TextStyle(color: Colors.grey, fontSize: 18),
+                        style:
+                            TextStyle(color: Colors.grey, fontSize: screenWidth * 0.045),
                       )
                     ],
                   ),
-                  SizedBox(height: 10),
-                  Divider(
-                    color: Colors.grey,
-                    thickness: 1,
-                  ),
-                  SizedBox(height: 10),
+                  Divider(color: Colors.grey, thickness: 1),
+                  SizedBox(height: screenHeight * 0.01),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -260,22 +266,22 @@ class _CartpageState extends State<Cartpage> {
                         "Total Pembayaran",
                         style: TextStyle(
                             color: Colors.black,
-                            fontSize: 18,
+                            fontSize: screenWidth * 0.05,
                             fontWeight: FontWeight.bold),
                       ),
                       Text(
                         "Rp.104.000,00",
                         style: TextStyle(
                             color: Colors.black,
-                            fontSize: 18,
+                            fontSize: screenWidth * 0.05,
                             fontWeight: FontWeight.bold),
                       )
                     ],
                   ),
-                  SizedBox(height: 20),
+                  SizedBox(height: screenHeight * 0.02),
                   Container(
-                    height: 50,
-                    width: MediaQuery.of(context).size.width / 2 * 2,
+                    height: screenHeight * 0.06,
+                    width: double.infinity,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(20),
                       color: const Color.fromARGB(217, 227, 111, 10),
@@ -284,7 +290,7 @@ class _CartpageState extends State<Cartpage> {
                       child: Text(
                         "Checkout",
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: screenWidth * 0.05,
                           color: Colors.white,
                           fontWeight: FontWeight.w500,
                         ),

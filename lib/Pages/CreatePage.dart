@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -7,82 +9,70 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 final supabase = Supabase.instance.client;
 
-class CreatePage extends StatelessWidget {
+class Createpage extends StatefulWidget {
+  const Createpage({super.key});
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: ProductForm(),
-    );
-  }
+  State<Createpage> createState() => _CreatepageState();
 }
 
-class ProductForm extends StatefulWidget {
-  @override
-  _ProductFormState createState() => _ProductFormState();
-}
-
-class _ProductFormState extends State<ProductForm> {
+class _CreatepageState extends State<Createpage> {
   String _katagori = 'Makanan';
-  XFile? _imageFile;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
+  File? _image;
 
-  Future<void> _pickImage() async {
+  Future pickImage() async {
     final ImagePicker _picker = ImagePicker();
-    final XFile? selectedImage =
-        await _picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      _imageFile = selectedImage;
-    });
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      setState(() {
+        _imageFile = File(image.path);
+      });
+      }
+    }
+  
+  Future uploadImage() async {
+    if (_imageFile == null) return;
+    final fileName = DateTime.now().millisecondsSinceEpoch.toString;
+    final path = 'upload/$fileName';
+
+    await Supabase.instance.client.storage
+    .from('food')
+    .upload(path, _imageFile!)
+    .then((value) => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Image upload successful!"))),);
   }
+  
 
   @override
   Widget build(BuildContext context) {
+    final mediaWidth = MediaQuery.of(context).size.width;
+    final mediaHeight = MediaQuery.of(context).size.height;
+
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            ElevatedButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => Addpage()),
-                );
-              },
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.all(15),
-                shape: CircleBorder(),
-                backgroundColor: Colors.white,
-                shadowColor: Colors.grey.withOpacity(0.5),
-              ),
-              child: Icon(Icons.chevron_left, size: 24, color: Colors.red),
-            ),
-            
-            ElevatedButton(
-              onPressed: () {
-                // Navigator.push(
-                //   // context,
-                //   // MaterialPageRoute(builder: (context) => AddPage()),
-                // );
-              },
-              style: ElevatedButton.styleFrom(
-                padding: EdgeInsets.all(15),
-                shape: CircleBorder(),
-                backgroundColor: Colors.white,
-                shadowColor: Colors.grey.withOpacity(0.5),
-              ),
-              child: Icon(CupertinoIcons.person,
-              size: 24, 
-              color: Colors.black),
-            ),
-          ],
+        title: const Text('Tambah Produk'),
+        centerTitle: true,
+        leading: IconButton(
+          icon: Icon(Icons.chevron_left, color: Colors.red),
+          onPressed: () {
+            Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => Addpage()),
+            );
+          },
         ),
+        actions: [
+          IconButton(
+            icon: Icon(CupertinoIcons.person, color: Colors.black),
+            onPressed: () {
+            },
+          ),
+        ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(20.0),
+        padding: EdgeInsets.all(mediaWidth * 0.05),
         child: Column(
           children: [
             TextField(
@@ -90,22 +80,22 @@ class _ProductFormState extends State<ProductForm> {
               decoration: InputDecoration(
                 labelText: 'Nama Produk',
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(mediaWidth * 0.05),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: mediaHeight * 0.02),
             TextField(
               controller: _priceController,
               decoration: InputDecoration(
                 labelText: 'Harga',
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(mediaWidth * 0.05),
                 ),
               ),
               keyboardType: TextInputType.number,
             ),
-            SizedBox(height: 20),
+            SizedBox(height: mediaHeight * 0.02),
             DropdownButtonFormField<String>(
               value: _katagori,
               items: ['Makanan', 'Minuman']
@@ -122,32 +112,39 @@ class _ProductFormState extends State<ProductForm> {
               decoration: InputDecoration(
                 labelText: 'Katagori Produk',
                 border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(mediaWidth * 0.05),
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: mediaHeight * 0.02),
             GestureDetector(
-              onTap: _pickImage,
               child: Container(
-                padding: EdgeInsets.symmetric(horizontal: 10, vertical: 15),
+                padding: EdgeInsets.symmetric(
+                  horizontal: mediaWidth * 0.03,
+                  vertical: mediaHeight * 0.015,
+                ),
                 decoration: BoxDecoration(
                   border: Border.all(color: Colors.grey),
-                  borderRadius: BorderRadius.circular(20),
+                  borderRadius: BorderRadius.circular(mediaWidth * 0.05),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(_imageFile == null ? 'Choose file' : 'Image Selected'),
+                    _imageFile != null 
+                    ? Image.file(_imageFile!)
+                    : const Text("No image selected.."),
+
+                    ElevatedButton(onPressed: pickImage,
+                        child: const Text('pick image'))
                   ],
                 ),
               ),
             ),
-            SizedBox(height: 20),
+            SizedBox(height: mediaHeight * 0.02),
             SizedBox(
               width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
+              height: mediaHeight * 0.07,
+              child: ElevatedButton(  
                 onPressed: () async {
                   final name = _nameController.text;
                   final price = _priceController.text;
@@ -156,15 +153,20 @@ class _ProductFormState extends State<ProductForm> {
                     'name': name,
                     'price': price,
                   });
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => Addpage()),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
+                    borderRadius: BorderRadius.circular(mediaWidth * 0.05),
                   ),
-                  backgroundColor: const Color.fromARGB(217, 227, 111, 10), 
+                  backgroundColor: const Color.fromARGB(217, 227, 111, 10),
                   foregroundColor: Colors.white,
                 ),
-                child: Text('Submit'),
+                child: Text('Submit',
+                    style: TextStyle(fontSize: mediaWidth * 0.04)),
               ),
             ),
           ],

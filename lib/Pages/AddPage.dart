@@ -27,6 +27,7 @@ class _AddpageState extends State<Addpage> {
 
   @override
   Widget build(BuildContext context) {
+     final mediaWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -71,151 +72,165 @@ class _AddpageState extends State<Addpage> {
       ),
       body: SingleChildScrollView(
         child: Padding(
-          padding: EdgeInsets.only(top: 20, left: 10, right: 5),
+          padding: EdgeInsets.symmetric(
+              vertical: mediaWidth * 0.05, horizontal: mediaWidth * 0.03),
           child: Column(
-          children: [
-            SizedBox(height: 20),
-            Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(8),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => CreatePage()),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 7),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    backgroundColor: const Color.fromARGB(217, 227, 111, 10),
-                    foregroundColor: Colors.white,
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "Add Data",
-                        style: TextStyle(fontSize: 12),
+            children: [
+              SizedBox(height: mediaWidth * 0.05),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => Createpage()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                          horizontal: mediaWidth * 0.03,
+                          vertical: mediaWidth * 0.02),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
                       ),
-                      SizedBox(width: 5),
-                      Icon(Icons.add, size: 20),
-                    ],
+                      backgroundColor: const Color.fromARGB(217, 227, 111, 10),
+                      foregroundColor: Colors.white,
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          "Add Data",
+                          style: TextStyle(fontSize: mediaWidth * 0.03),
+                        ),
+                        SizedBox(width: mediaWidth * 0.01),
+                        Icon(Icons.add, size: mediaWidth * 0.05),
+                      ],
+                    ),
                   ),
-                ),
-              ],
-            ),
-            SizedBox(height: 15),
-            Row(
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(10),
-                ),
-                Row(
-                  children: [
-                    Text(
+                ],
+              ),
+              SizedBox(height: mediaWidth * 0.04),
+              Row(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Text(
                       "Foto",
                       style: TextStyle(
                         color: Colors.black,
-                        fontSize: 10,
+                        fontSize: mediaWidth * 0.03,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(width: 70),
-                    Text(
+                  ),
+                  Expanded(
+                    flex: 4,
+                    child: Text(
                       "Nama Produk",
                       style: TextStyle(
                         color: Colors.black,
-                        fontSize: 10,
+                        fontSize: mediaWidth * 0.03,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(width: 70),
-                    Text(
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: Text(
                       "Harga",
                       style: TextStyle(
                         color: Colors.black,
-                        fontSize: 10,
+                        fontSize: mediaWidth * 0.03,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(width: 70),
-                    Text(
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: Text(
                       "Aksi",
                       style: TextStyle(
                         color: Colors.black,
-                        fontSize: 10,
+                        fontSize: mediaWidth * 0.03,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                  ],
-                )
-              ],
-            ),
-            SizedBox(height: 5),
-            Divider(
-              color: Colors.grey,
-              thickness: 1,
-            ),
-            SizedBox(height: 0),
-            FutureBuilder<List<dynamic>>(
-              future: fetcData(),
-              builder: (BuildContext context,
-                  AsyncSnapshot<List<dynamic>> snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const CircularProgressIndicator();
-                } else if (snapshot.hasError) {
-                  return Text('eror: ${snapshot.error}');
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Text('No data found');
-                } else {
-                  final List<dynamic> data = snapshot.data!;
-            return Column(
-              children: data.map((item) {
-                return Padding(
-                  padding: EdgeInsets.symmetric(vertical: 5),
-                child: Row(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.all(10),
-                      child: Image.asset(
-                        "assets/burger.jpeg",
-                        height: 60,
-                        width: 60,
-                      ),
-                    ),
-                    SizedBox(width: 24),
-                    Text(
-                      item['name'] ?? 'Tidak ada nama',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(width: 36),
-                    Text(
-                      "Rp. ${item['price'] ?? '0'}",
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(width: 46),
-                    IconButton(
-                                icon: Icon(CupertinoIcons.trash,
-                                    size: 24, color: Colors.red),
-                                onPressed: () async {
-                                  final id = item['id'];
-                              await deleteData(id);
-                                },
+                  ),
+                ],
+              ),
+              SizedBox(height: mediaWidth * 0.02),
+              Divider(
+                color: Colors.grey,
+                thickness: 1,
+              ),
+              FutureBuilder<List<dynamic>>(
+                future: fetcData(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<List<dynamic>> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text('Error: ${snapshot.error}');
+                  } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    return const Text('No data found');
+                  } else {
+                    final List<dynamic> data = snapshot.data!;
+                    return Column(
+                      children: data.map((item) {
+                        return Padding(
+                          padding:
+                              EdgeInsets.symmetric(vertical: mediaWidth * 0.02),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                flex: 2,
+                                child: Padding(
+                                  padding: EdgeInsets.all(mediaWidth * 0.02),
+                                  child: Image.asset(
+                                    "assets/burger.jpeg",
+                                    height: mediaWidth * 0.15,
+                                    width: mediaWidth * 0.15,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
-                   ],
+                              Expanded(
+                                flex: 4,
+                                child: Text(
+                                  item['name'] ?? 'Tidak ada nama',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: mediaWidth * 0.03,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 3,
+                                child: Text(
+                                  "Rp. ${item['price'] ?? '0'}",
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: mediaWidth * 0.03,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: IconButton(
+                                  icon: Icon(CupertinoIcons.trash,
+                                      size: mediaWidth * 0.06,
+                                      color: Colors.red),
+                                  onPressed: () async {
+                                    final id = item['id'];
+                                    await deleteData(id);
+                                  },
+                                ),
+                              ),
+                            ],
                           ),
                         );
                       }).toList(),
