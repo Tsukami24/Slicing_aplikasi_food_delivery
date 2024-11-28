@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/cupertino.dart';
@@ -18,31 +16,18 @@ class Createpage extends StatefulWidget {
 
 class _CreatepageState extends State<Createpage> {
   String _katagori = 'Makanan';
+  XFile? _imageFile;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
-  File? _image;
 
-  Future pickImage() async {
+  Future<void> _pickImage() async {
     final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        _imageFile = File(image.path);
-      });
-      }
-    }
-  
-  Future uploadImage() async {
-    if (_imageFile == null) return;
-    final fileName = DateTime.now().millisecondsSinceEpoch.toString;
-    final path = 'upload/$fileName';
-
-    await Supabase.instance.client.storage
-    .from('food')
-    .upload(path, _imageFile!)
-    .then((value) => ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Image upload successful!"))),);
+    final XFile? selectedImage =
+        await _picker.pickImage(source: ImageSource.gallery);
+    setState(() {
+      _imageFile = selectedImage;
+    });
   }
-  
 
   @override
   Widget build(BuildContext context) {
@@ -118,6 +103,7 @@ class _CreatepageState extends State<Createpage> {
             ),
             SizedBox(height: mediaHeight * 0.02),
             GestureDetector(
+              onTap: _pickImage,
               child: Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: mediaWidth * 0.03,
@@ -130,12 +116,7 @@ class _CreatepageState extends State<Createpage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _imageFile != null 
-                    ? Image.file(_imageFile!)
-                    : const Text("No image selected.."),
-
-                    ElevatedButton(onPressed: pickImage,
-                        child: const Text('pick image'))
+                    Text(_imageFile == null ? 'Choose file' : 'Image Selected'),
                   ],
                 ),
               ),
@@ -144,7 +125,7 @@ class _CreatepageState extends State<Createpage> {
             SizedBox(
               width: double.infinity,
               height: mediaHeight * 0.07,
-              child: ElevatedButton(  
+              child: ElevatedButton(
                 onPressed: () async {
                   final name = _nameController.text;
                   final price = _priceController.text;
