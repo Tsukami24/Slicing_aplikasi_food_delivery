@@ -24,7 +24,7 @@ class _CartpageState extends State<Cartpage> {
     setState(() {});
   }
 
-  @override
+@override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
@@ -102,6 +102,8 @@ class _CartpageState extends State<Cartpage> {
                     final List<dynamic> data = snapshot.data!;
                     return Column(
                       children: data.map<Widget>((item) {
+                        final imageUrl = item['image_url'] ??
+                            'https://via.placeholder.com/150';
                         return Column(
                           children: [
                             Row(
@@ -117,9 +119,11 @@ class _CartpageState extends State<Cartpage> {
                                     color: Colors.white,
                                     borderRadius: BorderRadius.circular(10),
                                   ),
-                                  child: Image.asset(
-                                    "assets/burger.jpeg",
-                                    fit: BoxFit.cover,
+                                  child: Image.network(
+                                    imageUrl,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Icon(Icons.broken_image),
                                   ),
                                 ),
                                 SizedBox(width: screenWidth * 0.04),

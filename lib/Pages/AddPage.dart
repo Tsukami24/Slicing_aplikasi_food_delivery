@@ -27,7 +27,7 @@ class _AddpageState extends State<Addpage> {
 
   @override
   Widget build(BuildContext context) {
-     final mediaWidth = MediaQuery.of(context).size.width;
+    final mediaWidth = MediaQuery.of(context).size.width;
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -179,6 +179,8 @@ class _AddpageState extends State<Addpage> {
                     final List<dynamic> data = snapshot.data!;
                     return Column(
                       children: data.map((item) {
+                          final imageUrl = item['image_url'] ??
+                            'https://via.placeholder.com/150';
                         return Padding(
                           padding:
                               EdgeInsets.symmetric(vertical: mediaWidth * 0.02),
@@ -188,11 +190,11 @@ class _AddpageState extends State<Addpage> {
                                 flex: 2,
                                 child: Padding(
                                   padding: EdgeInsets.all(mediaWidth * 0.02),
-                                  child: Image.asset(
-                                    "assets/burger.jpeg",
-                                    height: mediaWidth * 0.15,
-                                    width: mediaWidth * 0.15,
-                                    fit: BoxFit.cover,
+                                  child:Image.network(
+                                    imageUrl,
+                                    errorBuilder:
+                                        (context, error, stackTrace) =>
+                                            const Icon(Icons.broken_image),
                                   ),
                                 ),
                               ),
@@ -230,6 +232,7 @@ class _AddpageState extends State<Addpage> {
                                   },
                                 ),
                               ),
+                              
                             ],
                           ),
                         );
@@ -238,8 +241,10 @@ class _AddpageState extends State<Addpage> {
                   }
                 },
               ),
+              
             ],
           ),
+          
         ),
       ),
     );

@@ -1,9 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:starbak_mart/Pages/AddPage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-
 
 final supabase = Supabase.instance.client;
 
@@ -16,18 +17,39 @@ class Createpage extends StatefulWidget {
 
 class _CreatepageState extends State<Createpage> {
   String _katagori = 'Makanan';
-  XFile? _imageFile;
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _priceController = TextEditingController();
+  File? _imageFile;
 
-  Future<void> _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? selectedImage =
-        await _picker.pickImage(source: ImageSource.gallery);
-    setState(() {
-      _imageFile = selectedImage;
-    });
+ Future pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+
+    if (image != null) {
+      setState(() {
+        _imageFile = File(image.path);
+      });
+    }
   }
+
+  Future<String?> uploadImage(String path) async {
+    if (_imageFile == null) return null;
+
+    final fileName = DateTime.now().millisecondsSinceEpoch;
+    final uploadPath = 'uploads/$fileName';
+
+    final response = await supabase.storage
+        .from('food')
+        .upload(uploadPath, _imageFile!);
+
+    return supabase.storage.from('food').getPublicUrl(uploadPath);
+  }
+
+    Future<List<dynamic>> fetchData() async {
+    final response = await supabase.from('food').select('*');
+    return response as List<dynamic>;
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -42,17 +64,16 @@ class _CreatepageState extends State<Createpage> {
         leading: IconButton(
           icon: Icon(Icons.chevron_left, color: Colors.red),
           onPressed: () {
-            Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => Addpage()),
+            Navigator.pop(
+              context,
+              MaterialPageRoute(builder: (context) => Addpage()),
             );
           },
         ),
         actions: [
           IconButton(
             icon: Icon(CupertinoIcons.person, color: Colors.black),
-            onPressed: () {
-            },
+            onPressed: () {},
           ),
         ],
       ),
@@ -103,7 +124,6 @@ class _CreatepageState extends State<Createpage> {
             ),
             SizedBox(height: mediaHeight * 0.02),
             GestureDetector(
-              onTap: _pickImage,
               child: Container(
                 padding: EdgeInsets.symmetric(
                   horizontal: mediaWidth * 0.03,
@@ -116,7 +136,20 @@ class _CreatepageState extends State<Createpage> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(_imageFile == null ? 'Choose file' : 'Image Selected'),
+                    _imageFile != null
+                        ? Flexible(
+                            child: Image.file(
+                              _imageFile!,
+                              width: mediaWidth * 0.3,
+                              height: mediaHeight * 0.15,
+                              fit: BoxFit.cover,
+                            ),
+                          )
+                        : const Text("No image selected"),
+                    ElevatedButton(
+                      onPressed: pickImage,
+                      child: const Text("Pick Image"),
+                    ),
                   ],
                 ),
               ),
@@ -130,11 +163,17 @@ class _CreatepageState extends State<Createpage> {
                   final name = _nameController.text;
                   final price = _priceController.text;
 
+                    var imageUrl = await uploadImage('uploads');
+                  if (imageUrl == null) return;
+
+
                   await supabase.from('food').insert({
                     'name': name,
                     'price': price,
+                    'image_url': imageUrl,
+
                   });
-                  Navigator.pushReplacement(
+                  Navigator.pop(
                     context,
                     MaterialPageRoute(builder: (context) => Addpage()),
                   );

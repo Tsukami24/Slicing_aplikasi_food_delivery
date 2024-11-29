@@ -45,7 +45,7 @@ class _HomepageState extends State<Homepage> {
             ),
           ),
 
-          SizedBox(height: 15),
+        SizedBox(height: 15),
 
           Expanded(
             child: FutureBuilder<List<dynamic>>(
@@ -69,6 +69,8 @@ class _HomepageState extends State<Homepage> {
                         spacing: 25.0,
                               runSpacing: 20.0, 
                         children: data.map((item) {
+                          final imageUrl = item['image_url'] ??
+                            'https://via.placeholder.com/150';
                         return Padding(
                                 padding:EdgeInsets.symmetric(
                                     vertical: 15, horizontal: 10),
@@ -96,11 +98,12 @@ class _HomepageState extends State<Homepage> {
                                       children: [
                                         Container(
                                           alignment: Alignment.center,
-                                          child: Image.asset(
-                                              "assets/burger.jpeg",
-                                              fit: BoxFit.cover,
-                                              width: screenWidth * 0.35
-                                              ),
+                                          child: Image.network(
+                                            imageUrl,
+                                            errorBuilder: (context, error,
+                                                    stackTrace) =>
+                                                const Icon(Icons.broken_image),
+                                          ),
                                           height: screenWidth * 0.32,
                                         ),
                                         SizedBox(height: 8),
